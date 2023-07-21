@@ -1,0 +1,315 @@
+﻿@model BusCompositeViewModel;
+
+
+@{
+    ViewData["Title"] = "Bus Details";
+}
+
+@section Css{
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCYSc1HVpre2VsOCttajANlEwB3-Vzb7N8"></script>
+    <script>
+        function initMap() {
+
+            var accessLocations = [
+        @if (Model.Bus.Line != null)
+        {
+            @foreach (var point in Model.Bus.Line.LinesSP)
+            {
+                @:['<h4>' + '@point.StopPoint.Name' + '</h4>' , @point.StopPoint.Latitude, @point.StopPoint.Longitude],
+            }
+        }
+
+                              ];
+
+            var map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: 31.279393272965454, lng: 34.25513974267617 },
+                zoom: 15,
+                styles: [
+                    {
+                        featureType: 'poi',
+                        elementType: 'labels',
+                        stylers: [{ visibility: 'off' }]
+                    }
+                ]
+            });
+
+            var infowindow = new google.maps.InfoWindow();
+            var stopAccessIcon = {
+                url: '/AdminSection/img/BusStopPointAccess.png',
+                size: new google.maps.Size(35, 35),
+                scaledSize: new google.maps.Size(35, 35)
+            };
+
+            // Create markers for access stop points
+            var accessMarkers = [];
+            for (var i = 0; i < accessLocations.length; i++) {
+                var marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(accessLocations[i][1], accessLocations[i][2]),
+                    map: map,
+                    title: accessLocations[i][0],
+                    icon: stopAccessIcon
+                });
+
+                google.maps.event.addListener(marker, 'click', (function (marker, i) {
+                    return function () {
+                        infowindow.setContent(accessLocations[i][0]);
+                        infowindow.open(map, marker);
+                    }
+                })(marker, i));
+
+                accessMarkers.push(marker);
+            }
+
+            // Create markers for access stop points
+
+        @if (Model.Bus != null)
+        {
+            @:    var busMarker = new google.maps.Marker({
+            @:position: new google.maps.LatLng(@Model.Bus.Latitude, @Model.Bus.Longitude),
+            @:map: map,
+            @:icon:
+            @:{
+            @:url: '/AdminSection/img/bus-icon.png',
+            @:size: new google.maps.Size(32, 32),
+            @:scaledSize: new google.maps.Size(32, 32)
+            @:  }
+            @:  });
+
+            @:    function getLiveBusLocation()
+            @:{
+            @:$.ajax({
+            @:url: '/Admin/Bus/GetBusLocation/@Model.Bus.Id',
+            @:type: 'GET',
+            @:success: function (data) {
+            @:              if (busMarker)
+            @:{
+            @:busMarker.setPosition(new google.maps.LatLng(data.latitude, data.longitude));
+            @:console.log(data.latitude);
+            @:console.log(data.longitude);
+            @:          }
+            @:      },
+            @:error: function () {
+            @:console.log('Error fetching bus location');
+            @:       }
+            @:   });
+            @:    }
+
+            @:busMarker.addListener('click', function () {
+            @:window.open('/Admin/Bus/Details/@Model.Bus.Id', '_blank');
+            @: });
+            @:setInterval(getLiveBusLocation, 2000);
+
+        }
+
+         }
+    </script>
+    @*<script>
+        function initMap() {
+            var map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: @Model.Bus.Latitude, lng: @Model.Bus.Longitude },
+                zoom: 15
+            });
+
+            // Define the center point
+            var center = new google.maps.LatLng(31.27985566225806, 34.25469938867097);
+
+            // Create a circle buffer around the center point
+            var bufferRadius = 10; // Example buffer radius of 500 meters
+            var circle = new google.maps.Circle({
+                center: center,
+                radius: bufferRadius,
+                strokeColor: "#FF0000",
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+                fillColor: "#FF0000",
+                fillOpacity: 0.35,
+                map: map
+            });
+
+            var busIcon = {
+                url: 'https://e7.pngegg.com/pngimages/535/1005/png-clipart-white-and-red-vehicle-illustration-school-bus-san-diego-metropolitan-transit-system-computer-icons-bus-stop-red-bus-icon-transport-signage.png',
+                scaledSize: new google.maps.Size(25, 25),
+                origin: new google.maps.Point(0, 0),
+                anchor: new google.maps.Point(25, 25)
+            };
+
+            var stops = [
+                { lat: 31.283638301367013, lng: 34.25125778148497 },
+                { lat: 31.275380180458917, lng: 34.2575860061541 }
+            ];
+
+            var directionsService = new google.maps.DirectionsService();
+            var directionsRenderer = new google.maps.DirectionsRenderer({
+                map: map,
+                suppressMarkers: true
+            });
+
+            var waypoints = [];
+            for (var i = 1; i < stops.length - 1; i++) {
+                waypoints.push({
+                    location: stops[i],
+                    stopover: true
+                });
+            }
+
+            var request = {
+                origin: stops[0],
+                destination: stops[stops.length - 1],
+                waypoints: waypoints,
+                travelMode: google.maps.TravelMode.DRIVING
+            };
+
+            directionsService.route(request, function (result, status) {
+                if (status == google.maps.DirectionsStatus.OK) {
+                    directionsRenderer.setDirections(result);
+
+                    var marker = new google.maps.Marker({
+                        position: stops[0],
+                        map: map,
+                        icon: busIcon
+                    });
+                }
+            });
+        }
+    </script>
+*@
+    <style>
+        #map {
+            height: 800px;
+            width: 100%;
+        }
+    </style>
+}
+@section Scripts{
+    <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+    <script src="~/AdminSection/vendor/bootstrap-datepicker.js"></script>
+    <script>$('input.date-pick').datepicker();</script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCYSc1HVpre2VsOCttajANlEwB3-Vzb7N8&callback=initMap"></script>
+}
+
+
+<div class="container-fluid">
+    <!-- Breadcrumbs-->
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="~/Admin">Dashboard</a>
+        </li>
+        <li class="breadcrumb-item active">Buses</li>
+    </ol>
+    <div class="box_general pb-3">
+        <div class="header_box">
+            <h2 class="d-inline-block">Bus</h2>
+        </div>
+        <div class="list_general order">
+            <ul>
+                <li>
+                    <figure><img src="~/@Model.Bus.ImgPath" alt=""></figure>
+                    <h4>
+                        @Model.Bus.Name
+                        @if (Model.Bus.IsActive)
+                        {
+                            <i class="approved">Active</i>
+                        }
+                        else
+                        {
+                            <i class="cancel">Inactive</i>
+                        }
+                        @*<i class="pending">Pending</i>*@
+                    </h4>
+
+                    <ul class="booking_list">
+                        <li><strong>Bus Number</strong>   @Model.Bus.Number </li>
+                        <li>
+                            <strong>Bus Password</strong>
+                            @if (@ViewBag.UserType == UserType.CompanyAdmin.ToString())
+                            {
+                                @Model.Bus.Password
+                            }
+                            else
+                            {
+                                @:*******
+                            }
+                        </li>
+                        <li><strong>Company Name</strong>  <a href="~/Admin/Company/Details/@Model.Bus.Company.Id"> @Model.Bus.Company.Name</a> </li>
+                        <li><strong>Company Phone</strong> @Model.Bus.Company.PhoneNumber</li>
+                        <li><strong>Company Address</strong> @Model.Bus.Company.Address </li>
+                        <li>
+                            <strong>Line</strong>
+                            @if (@Model.Bus.Line != null)
+                            {
+                                @Model.Bus.Line.Name
+                            }
+                            else
+                            {
+                                @:Null
+                            }
+
+                        </li>
+                    </ul>
+                    @if (@ViewBag.UserType == UserType.CompanyAdmin.ToString())
+                    {
+                        <p>
+                            <a href="#0" class="btn_1" data-toggle="modal" data-target="#client_detail_modal"><i class="fa fa-fw fa-pencil"></i> Edit Bus detail</a>
+                        </p>
+                    }
+
+                </li>
+
+            </ul>
+        </div>
+        <hr>
+        <h5>Bus in Map</h5>
+        <div class="table-responsive">
+            <!--Map-->
+            <div id="map"></div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Bus Detail Modal -->
+<form action="~/Admin/Bus/Edit" method="post" enctype="multipart/form-data">
+    <div class="modal fade" id="client_detail_modal" tabindex="-1" role="dialog" aria-labelledby="client_detail_modalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="client_detail_modalLabel">Edit Bus detail</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input hidden required asp-for="Dto.Id" value="@Model.Bus.Id">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input required asp-for="Dto.Name" type="text" class="form-control" value="@Model.Bus.Name">
+                    </div>
+                    <!-- /Row -->
+                    <div class="form-group">
+                        <label>Company</label>
+                        <input disabled type="text" class="form-control" value="@Model.Bus.Company.Name">
+                    </div>
+                    <!-- /Row -->
+                    <div class="form-group">
+                        <label>Bus Number</label>
+                        <input required asp-for="Dto.Number" type="text" class="form-control" value="@Model.Bus.Number">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input required asp-for="Dto.Password" type="password" class="form-control" value="@Model.Bus.Password">
+                    </div>
+                    <div class="form-group">
+                        <label>Photo</label>
+                        @*<form action="" class="dropzone"></form>*@
+                        <input asp-for="Dto.Image" type="file" accept="image/*" class="form-control-file">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    @*<a class="btn btn-primary" href="#0">Save</a>*@
+                    <button type="submit" class="btn_1 medium">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

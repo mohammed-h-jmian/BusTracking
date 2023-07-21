@@ -1,0 +1,257 @@
+@model StopPointCompositeViewModel;
+
+@{
+    ViewData["Title"] = "Stop Points Page";
+}
+
+@section Css{
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC9SetMD4nKs5jRq5KVC3iMyTKl4ev3cAM"></script>
+      <style>
+        #map {
+            height: 800px;
+            width: 100%;
+        }
+    </style>
+<script>
+    function initMap() {
+        var map = new google.maps.Map(document.getElementById('map'), {
+            center: { lat: 31.279393272965454, lng: 34.25513974267617 },
+            zoom: 15,
+            styles: [
+                {
+                    featureType: 'poi',
+                    elementType: 'labels',
+                    //stylers: [{ visibility: 'off' }]
+                }
+            ]
+        });
+
+        var locations = [
+            @if (Model.ListStopPoints.Any())
+            {
+                foreach (var point in Model.ListStopPoints)
+                {
+                    @:['<h4> @point.Name </h4>', @point.Latitude, @point.Longitude],
+                }
+            }
+        ];
+
+        var infowindow = new google.maps.InfoWindow();
+        var allStopIcon = {
+            url: '/AdminSection/img/BusStopPoint1.png',
+            size: new google.maps.Size(35, 35),
+            scaledSize: new google.maps.Size(35, 35)
+        };
+
+        // Create markers for non-access stop points
+        var locationsMarkers = [];
+        for (var i = 0; i < locations.length; i++) {
+            var marker = new google.maps.Marker({
+                position: new google.maps.LatLng(locations[i][1], locations[i][2]),
+                map: map,
+                title: locations[i][0],
+                icon: allStopIcon
+            });
+
+            google.maps.event.addListener(marker, 'click', (function (marker, i) {
+                return function () {
+                    infowindow.setContent(locations[i][0]);
+                    infowindow.open(map, marker);
+                }
+            })(marker, i));
+
+            locationsMarkers.push(marker);
+        }
+
+        var marker = new google.maps.Marker({
+            position: { lat: 31.279393272965454, lng: 34.25513974267617 },
+            map: map,
+            draggable: true // Make the marker draggable
+        });
+
+        // Update the input fields when the marker position changes
+        google.maps.event.addListener(marker, 'dragend', function () {
+            var latLng = marker.getPosition();
+            $('input[name="CreateDto.Latitude"]').val(latLng.lat());
+            $('input[name="CreateDto.Longitude"]').val(latLng.lng());
+        });
+    }
+</script>
+
+
+
+
+}
+@section Scripts{
+    <script src="~/AdminSection/js/admin-datatables.js"></script>
+        <script src="~/AdminSection/vendor/bootstrap-datepicker.js"></script>
+    <script>$('input.date-pick').datepicker();</script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC9SetMD4nKs5jRq5KVC3iMyTKl4ev3cAM&callback=initMap"></script>
+}
+
+
+<div class="container-fluid">
+    <!-- Breadcrumbs-->
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="~/Admin">Dashboard</a>
+        </li>
+        <li class="breadcrumb-item active">Stop Points</li>
+    </ol>
+    <!-- Example DataTables Card-->
+    <div class="card mb-3">
+        <div class="row card-header" style="
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    align-items: baseline;
+">
+            <div> <i class="fa fa-table"></i> Stop Points Table</div>
+                @if (@ViewBag.UserType == UserType.MapAdmin.ToString())
+                    {
+            <a href="#0" class="btn_1" data-toggle="modal" data-target="#client_detail_modal">
+                <i class="fa fa-plus-square"></i> Add New Stop Point
+            </a>
+                    }
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Latitude</th>
+                            <th>Longitude</th>
+                            <th>Address</th>
+                            <th>City</th>
+                                 @if (@ViewBag.UserType == UserType.MapAdmin.ToString())
+                    {
+                            <th>Oprations</th>
+                    }
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Latitude</th>
+                            <th>Longitude</th>
+                            <th>Address</th>
+                            <th>City</th>
+                                 @if (@ViewBag.UserType == UserType.MapAdmin.ToString())
+                    {
+                            <th>Oprations</th>
+                    }
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        @if (Model.ListStopPoints.Any())
+                        {
+                            foreach (var point in Model.ListStopPoints)
+
+                            {
+                                <tr>
+                                    <td>@point.Id</td>
+                                    <td><a href="~/Admin/StopPoint/Details/@point.Id">@point.Name</a></td>
+                                    <td>@point.Latitude</td>
+                                    <td>@point.Longitude</td>
+                                    <td>@point.Address</td>
+                                    <td>@point.City.Name</td>
+                                 @if (@ViewBag.UserType == UserType.MapAdmin.ToString())
+                    {
+                                    <td>
+                                        @*  <a href="edit-order.html"><strong>Edit</strong></a> |  <a href="#0"><strong>Delete</strong></a>*@
+
+                                        <a href="~/Admin/StopPoint/Delete/@point.Id" onclick="return confirm('Are you sure you want to delete @point.Id ?');"><strong>Delete</strong></a>
+                                   </td>
+                    }
+                                </tr>
+                                            }
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- /tables-->
+</div>
+
+@*<div class="table-responsive">
+            <!--Map-->
+            <div id="map"></div>
+   </div>
+*@
+<!-- Create New Stop Point Modal -->
+<form action="~/Admin/StopPoint/Create" method="post" enctype="multipart/form-data">
+    <div class="modal fade" id="client_detail_modal" tabindex="-1" role="dialog" aria-labelledby="client_detail_modalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="client_detail_modalLabel">Create New Stop Point </h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Name</label>
+                                <input required asp-for="CreateDto.Name" type="text" class="form-control" >
+                                <span asp-validation-for="CreateDto.Name" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                              <div id="map"style="height: 400px;"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Latitude</label>
+                                <input required asp-for="CreateDto.Latitude" type="text" class="form-control" readonly> 
+                                <span asp-validation-for="CreateDto.Latitude" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Longitude</label>
+                                <input required asp-for="CreateDto.Longitude" type="text" class="form-control" readonly>
+                                <span asp-validation-for="CreateDto.Longitude" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /row-->
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>City</label>
+                                @*<input required asp-for="CreateDto.City" type="text" class="form-control">*@
+                                <select class="form-control" asp-for="CreateDto.CityId" asp-items="@(new SelectList(ViewBag.CitySelectList, "Value", "Text"))" required>
+                                    <option value="">Select a City</option>
+                                </select>
+                                <span asp-validation-for="CreateDto.CityId" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                <label>Address</label>
+                                <input required asp-for="CreateDto.Address" type="text" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    @*<a class="btn btn-primary" href="#0">Save</a>*@
+                    <button type="submit" class="btn_1 medium">Save</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</form>
+

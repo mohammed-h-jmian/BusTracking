@@ -1,0 +1,28 @@
+﻿@using BusTracking.Data.Models;
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager
+
+
+@if (SignInManager.IsSignedIn(User))
+{
+
+    <li class="nav-item">
+        <a class="nav-link" data-toggle="modal" data-target="#exampleModal"><i class="fa fa-fw fa-sign-out"></i>Logout</a>
+    </li>
+
+}
+else
+{
+    <li class="nav-item">
+        <a href="~/Admin/User/Login" class="nav-link">
+            <i class="fa fa-fw fa-sign-in"></i>Login
+        </a>
+    </li>
+    <li class="nav-item">
+        <a href="~/Admin/User/Register" class="nav-link">
+          Register
+        </a>
+    </li>
+}
+

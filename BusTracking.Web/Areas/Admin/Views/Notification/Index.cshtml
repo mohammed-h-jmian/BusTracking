@@ -1,0 +1,102 @@
+﻿@{
+    ViewData["Title"] = "Notifications";
+}
+
+@section Css{
+
+}
+@section Scripts{
+    <script src="~/AdminSection/js/admin-datatables.js"></script>
+    <script>
+        $(document).ready(function () {
+            function formatDateTime(dateTimeString) {
+                const dateTime = new Date(dateTimeString);
+                const now = new Date();
+
+                return dateTime.toLocaleDateString([], { hour: '2-digit', minute: '2-digit', year: 'numeric', month: 'short', day: 'numeric' });
+            }
+            function getAllNotifications() {
+                $.ajax({
+                    url: '/Admin/Notification/GetAll',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (data) {
+                        // Clear the existing table body
+                        $('#dataTable2 tbody').empty();
+                        console.log('Done');
+                        // Loop through the received data and append rows to the table
+                        $.each(data, function (index, notification) {
+                            var companyName = notification.company ? notification.company.name : 'null';
+                            var row = '<tr' + (notification.isRead ? '' : ' style="font-weight: 600;"') + '>' +
+                                '<td>' + notification.id + '</td>' +
+                                '<td>' + companyName + '</td>' +
+                                '<td>' + notification.subject + '</td>' +
+                                '<td>' + notification.text + '</td>' +
+                                //'<td>  <i class="' + (notification.isRead ? 'approved' : 'cancel') + '">' + (notification.isRead ? 'Read' : 'Unread') + '</i></td>' +
+                                '<td>' + formatDateTime(notification.createdAt) + '</td>' +
+                                '</tr>';
+                            $('#dataTable2 tbody').append(row);
+                        });
+                    },
+                    error: function (error) {
+                        console.log('Error:', error);
+                    },
+                    complete: function () {
+                        // Schedule the next AJAX request after a delay (e.g., every 5 seconds)
+                        setTimeout(getAllNotifications, 5000);
+                    }
+                });
+            }
+
+            // Call the function to get all notifications on page load
+            getAllNotifications();
+        });
+    </script>
+}
+
+
+
+<div class="container-fluid">
+    <!-- Breadcrumbs-->
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="~/Admin">Dashboard</a>
+        </li>
+        <li class="breadcrumb-item active">Lines</li>
+    </ol>
+    <!-- Example DataTables Card-->
+    <div class="card mb-3">
+        <div class="card-header">
+            <i class="fa fa-table"></i> Notifications Table
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable2" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>To</th>
+                            <th>Subject</th>
+                            <th>Text</th>
+                            @*<th>Status</th>*@
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>ID</th>
+                            <th>To</th>
+                            <th>Subject</th>
+                            <th>Text</th>
+                            @*<th>Status</th>*@
+                            <th>Time</th>
+                        </tr>
+                    </tfoot>
+                    <tbody id="dataTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- /tables-->
+</div>

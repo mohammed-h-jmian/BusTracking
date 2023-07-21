@@ -1,0 +1,199 @@
+﻿@model UserCompositeViewModel;
+@using BusTracking.Core.Enums;
+
+@{
+    ViewData["Title"] = Model.User.FullName + " Details";
+}
+
+@section Css{
+    <style>
+        /* Styles for the modal */
+        .modal1 {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal1-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 60%;
+        }
+
+        /* Styles to show the modal */
+        .show-modal1 {
+            display: block;
+        }
+    </style>
+
+}
+@section Scripts{
+    <script src="~/AdminSection/vendor/bootstrap-datepicker.js"></script>
+    <script>$('input.date-pick').datepicker();</script>
+    <script>
+        var modal = document.getElementById("myModal");
+
+        // Function to open the modal
+        function openModal() {
+            modal.classList.add("show-modal1");
+        }
+
+        // Function to close the modal
+        function closeModal() {
+            modal.classList.remove("show-modal1");
+            window.location.reload(); // Refresh the page
+        }
+    </script>
+}
+
+<div class="container-fluid">
+    <!-- Breadcrumbs-->
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="~/Admin">Dashboard</a>
+        </li>
+        <li class="breadcrumb-item active">User</li>
+    </ol>
+    @if (ViewBag.SuccessMessage != null)
+    {
+        <div id="successMessage" class="alert alert-success">@(ViewBag.SuccessMessage as string)</div>
+
+        <script>
+            setTimeout(function () {
+                var successMessage = document.getElementById('successMessage');
+                if (successMessage) {
+                    successMessage.style.display = 'none';
+                }
+            }, 10000);
+        </script>
+    }
+    else if (ViewBag.ErrorMessage != null)
+    {
+        <div id="errorMessage" class="alert alert-danger">@(ViewBag.ErrorMessage as string)</div>
+
+        <script>
+            setTimeout(function () {
+                var errorMessage = document.getElementById('errorMessage');
+                if (errorMessage) {
+                    errorMessage.style.display = 'none';
+                }
+            }, 10000);
+        </script>
+    }
+
+
+    <div class="box_general pb-3">
+        <div class="header_box">
+            <h2 class="d-inline-block">Details </h2>
+        </div>
+        <div class="list_general order">
+            <ul>
+                <li>
+                    <figure>
+                        @if (@Model.User.ImageUrl != null)
+                        {
+                            <img src="@Model.User.ImageUrl" alt="">
+                        }
+                        else
+                        {
+                            <img src="~/UserImg/defultImg.png" alt="">
+                        }
+                    </figure>
+                    <h4>
+                        @Model.User.FullName
+                        @if (@Model.User.Company != null)
+                        {
+
+
+                            @if (@ViewBag.UserType == UserType.Administrator.ToString())
+                            {
+
+                                @if (@Model.User.Company.Status == Status.Activated)
+                                {
+                                    <i class="approved">Active</i>
+                                }
+                                else
+                                {
+                                    <i class="pending">Pending</i>
+                                }
+                            }
+                        }
+
+                    </h4>
+                    <ul class="booking_list">
+                        @if (@Model.User.Company != null)
+                        {
+                            <li><strong>Company Name</strong><a href="~/Admin/Company/Details/@Model.User.Company.Id">@Model.User.Company.Name</a></li>
+                        }
+                        <li><strong>Phone Number</strong> <a href="#0">@Model.User.PhoneNumber</a> </li>
+                        <li><strong>Email</strong> <a href="#0">@Model.User.Email</a> </li>
+                        <li><strong>User type</strong>@Model.User.UserType </li>
+
+                    </ul>
+                    @if (@ViewBag.UserId == Model.User.Id)
+                    {
+                        <p>
+                            <a href="#0" class="btn_1" data-toggle="modal" data-target="#client_detail_modal">
+                                <i class="fa fa-fw fa-pencil"></i>
+                                Edit User details
+                            </a>
+                            <a href="~/Admin/User/NewPassword/@Model.User.Id" class="btn_1">
+                                <i class="fa fa-fw fa-pencil"></i>
+                                Generate New Password
+                            </a>
+                        </p>
+                    }
+
+                </li>
+            </ul>
+        </div>
+        <hr>
+    </div>
+    <!-- /box_general-->
+</div>
+
+<!-- User Detail Modal -->
+<form action="~/Admin/User/Edit" method="post" enctype="multipart/form-data">
+    <div class="modal fade" id="client_detail_modal" tabindex="-1" role="dialog" aria-labelledby="client_detail_modalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="client_detail_modalLabel">Edit User details</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input hidden required asp-for="UpdateDto.Id" value="@Model.User.Id" />
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input required asp-for="UpdateDto.FullName" type="text" class="form-control" value="@Model.User.FullName">
+                    </div>
+                    <!-- /Row -->
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input required asp-for="UpdateDto.PhoneNumber" type="text" class="form-control" value="@Model.User.PhoneNumber">
+                    </div>
+                    <div class="form-group">
+                        <label>Logo</label>
+                        <input asp-for="UpdateDto.ImageUrl" type="file" accept="image/*" class="form-control-file">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    @*<a class="btn btn-primary" href="#0">Save</a>*@
+                    <button type="submit" class="btn_1 medium">Save</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</form>

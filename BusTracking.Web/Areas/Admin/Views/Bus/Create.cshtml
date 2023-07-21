@@ -1,0 +1,149 @@
+﻿@model CreateBusDto;
+
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="Ansonika">
+    <title>BUS TRACKER - @ViewData["Title"]</title>
+    <!-- Favicons-->
+    <link rel="shortcut icon" href="~/AdminSection/img/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" type="image/x-icon" href="~/AdminSection/img/apple-touch-icon-57x57-precomposed.png">
+    <link rel="apple-touch-icon" type="image/x-icon" sizes="72x72" href="~/AdminSection/img/apple-touch-icon-72x72-precomposed.png">
+    <link rel="apple-touch-icon" type="image/x-icon" sizes="114x114" href="~/AdminSection/img/apple-touch-icon-114x114-precomposed.png">
+    <link rel="apple-touch-icon" type="image/x-icon" sizes="144x144" href="~/AdminSection/img/apple-touch-icon-144x144-precomposed.png">
+    <!-- Bootstrap core CSS-->
+    <link href="~/AdminSection/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Main styles -->
+    <link href="~/AdminSection/css/admin.css" rel="stylesheet">
+    <!-- Icon fonts-->
+    <link href="~/AdminSection/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <!-- Plugin styles -->
+    <link href="~/AdminSection/vendor/datatables/dataTables.bootstrap4.css" rel="stylesheet">
+    <!-- Custom styles for All pages -->
+    <link href="~/AdminSection/css/custom.css" rel="stylesheet">
+    <!-- Custom styles for this page -->
+    <link href="~/AdminSection/vendor/dropzone.css" rel="stylesheet">
+    <link href="~/AdminSection/css/date_picker.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="~/AdminSection/js/editor/summernote-bs4.css">
+
+</head>
+
+<body class="fixed-nav sticky-footer" id="page-top">
+    <div class="content-wrapper">
+
+        <div class="container-fluid">
+            <form action="~/Admin/Bus/Create" method="post" enctype="multipart/form-data">
+                <input hidden asp-for="CompanyId" value="@ViewBag.CompanyId">
+
+                <div class="box_general padding_bottom">
+                    <div class="header_box version_2">
+                        <h2><i class="fa fa-file"></i>Basic info</h2>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Bus Name</label>
+                                <input asp-for="Name" type="text" class="form-control" placeholder="Red Bus">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Password</label>
+                                <input asp-for="Password" type="password" class="form-control" placeholder="***********">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /row-->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Bus number</label>
+                                <input asp-for="Number" type="text" class="form-control" placeholder="3-0000-00">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Photo</label>
+                                @*<form action="" class="dropzone"></form>*@
+                                <input asp-for="Image" type="file" accept="image/*" class="form-control-file">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- /row-->
+                </div>
+
+                <!-- /.container-wrapper-->
+                <p>
+                    @*            <a href="#0" class="btn_1 medium">Save</a>*@
+                    <button type="submit" class="btn_1 medium">Save</button>
+                </p>
+            </form>
+        </div>
+
+
+    </div>
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="~/AdminSection/vendor/jquery/jquery.min.js"></script>
+    <script src="~/AdminSection/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- Core plugin JavaScript-->
+    <script src="~/AdminSection/vendor/jquery-easing/jquery.easing.min.js"></script>
+    <!-- Page level plugin JavaScript-->
+    <script src="~/AdminSection/vendor/chart.js/Chart.js"></script>
+    <script src="~/AdminSection/vendor/datatables/jquery.dataTables.js"></script>
+    <script src="~/AdminSection/vendor/datatables/dataTables.bootstrap4.js"></script>
+    <script src="~/AdminSection/vendor/jquery.magnific-popup.min.js"></script>
+    <!-- Custom scripts for all pages-->
+    <script src="~/AdminSection/js/admin.js"></script>
+    <!-- Custom scripts for this page-->
+    <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+    <script src="~/AdminSection/vendor/dropzone.min.js"></script>
+    <script src="~/AdminSection/vendor/bootstrap-datepicker.js"></script>
+    <script>
+        $('input.date-pick').datepicker();
+    </script>
+    <!-- WYSIWYG Editor -->
+    <script src="~/AdminSection/js/editor/summernote-bs4.min.js"></script>
+    <script>
+        $('.editor').summernote({
+            fontSizes: ['10', '14'],
+            toolbar: [
+                // [groupName, [list of button]]
+                ['style', ['bold', 'italic', 'underline', 'clear']],
+                ['font', ['strikethrough']],
+                ['fontsize', ['fontsize']],
+                ['para', ['ul', 'ol', 'paragraph']]
+            ],
+            placeholder: 'Write here ....',
+            tabsize: 2,
+            height: 200
+        });
+    </script>
+</body>
+
+
+</html>
+
+
+
+
+
+
+
+
+
+
+

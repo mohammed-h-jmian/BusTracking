@@ -1,0 +1,106 @@
+﻿@model List<BusViewModel>;
+
+@{
+    ViewData["Title"] = "Buses Page";
+}
+
+@section Css{
+
+}
+@section Scripts{
+    <script src="~/AdminSection/js/admin-datatables.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+}
+
+
+<div class="container-fluid">
+    <!-- Breadcrumbs-->
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="~/Admin">Dashboard</a>
+        </li>
+        <li class="breadcrumb-item active">Buses</li>
+    </ol>
+    <!-- Example DataTables Card-->
+    <div class="card mb-3">
+        <div class="card-header">
+             <i class="fa fa-table"></i> Buses Table
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>IMG</th>
+                            <th>Number</th>
+                            <th>Name</th>
+                            <th>Company</th>
+                            <th>IsActive</th>
+                             @if (@ViewBag.UserType == UserType.CompanyAdmin.ToString())
+                                    {
+                            <th>Operations</th>
+                                    }
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>ID</th>
+                            <th>IMG</th>
+                            <th>Number</th>
+                            <th>Name</th>
+                            <th>Company</th>
+                            <th>IsActive</th>
+                            @if (@ViewBag.UserType == UserType.CompanyAdmin.ToString())
+                            {
+                                <th>Operations</th>
+                            }
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        @if (Model.Any())
+                        {
+                            foreach (var bus in Model)
+                            {
+                                <tr>
+                                    <td>@bus.Id</td>
+                                    @*<td>@bus.ImgPath</td>*@
+                                    <td> <a href="~/Admin/Bus/Details/@bus.Id"><img src="~/@bus.ImgPath" alt="" style="width:100px;"></a></td>
+                                    <td><a href="~/Admin/Bus/Details/@bus.Id"><strong>@bus.Number</strong></a></td>
+                                    <td><a href="~/Admin/Bus/Details/@bus.Id"><strong>@bus.Name</strong></a></td>
+                                    <td>@bus.Company.Name</td>
+                                    <td>
+                                        @*<i class="pending">Pending</i>*@
+                                        @if (bus.IsActive)
+                                        {
+                                            <i class="approved">Active</i>
+                                        }
+                                        else
+                                        {
+
+                                            <i class="cancel">Inactive</i>
+
+                                        }
+                                    </td>
+                                    
+                                        @*<a href="edit-order.html"><strong>Edit</strong></a> | <a href="#0"><strong>Delete</strong></a>*@
+                                        @if (@ViewBag.UserType == UserType.CompanyAdmin.ToString())
+                                        {
+                                            <td>
+                                            <a href="~/Admin/Bus/Delete/@bus.Id" onclick="return confirm('Are you sure you want to delete @bus.Name?');"><strong>Delete</strong></a>
+                                        </td>
+                                    }
+                                   
+                                </tr>
+                            }
+                        }
+
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- /tables-->
+</div>

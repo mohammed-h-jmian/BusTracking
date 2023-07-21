@@ -1,0 +1,183 @@
+﻿@using BusTracking.Data.Models;
+@using Microsoft.AspNetCore.Identity;
+@inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager
+
+<!DOCTYPE html>
+<html dir="ltr" lang="en-US">
+
+
+<!-- Mirrored from landing.zytheme.com/appy/landing-01-image-bg.html by HTTrack Website Copier/3.x [XR&CO'2014], Mon, 10 Jul 2023 10:50:56 GMT -->
+<head>
+    <!-- Document Meta
+    ============================================= -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!--IE Compatibility Meta-->
+    <meta name="author" content="zytheme" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="Multi-purpose Business html5 landing page">
+@*    <link href="/Public/images/favicon/favicon.ico" rel="icon">*@
+        <link rel="shortcut icon" href="~/AdminSection/img/favicon.ico" type="image/x-icon">
+
+
+    <!-- Fonts
+    ============================================= -->
+    @*<link href='http://fonts.googleapis.com/css?family=Raleway:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i%7COpen+Sans:300,300i,400,400i,600,600i,700,700i,800,800' rel='stylesheet' type='text/css'>*@
+    <link href="/Public/fonts/Raleway.css" rel="stylesheet">
+
+    <!-- Stylesheets
+    ============================================= -->
+    <link href="/Public/css/external.css" rel="stylesheet">
+    <link href="/Public/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/Public/css/style.css" rel="stylesheet">
+    <!-- COLORS -->
+    <link rel="stylesheet" href="/Public/css/themes/theme-default.css" />
+    <!--<link rel="stylesheet" href="/Public/css/themes/theme-blue.css"/>-->
+    <!--<link rel="stylesheet" href="/Public/css/themes/theme-light-blue.css"/>-->
+    <!--<link rel="stylesheet" href="/Public/css/themes/theme-green.css"/>-->
+    <!--<link rel="stylesheet" href="/Public/css/themes/theme-light-green.css"/>-->
+    <!--<link rel="stylesheet" href="/Public/css/themes/theme-orange.css"/>-->
+    <!--<link rel="stylesheet" href="/Public/css/themes/theme-deep-orange.css"/>-->
+    <!--<link rel="stylesheet" href="/Public/css/themes/theme-purple.css"/>-->
+    <!--<link rel="stylesheet" href="/Public/css/themes/theme-deep-purple.css"/>-->
+    <!--<link rel="stylesheet" href="/Public/css/themes/theme-gray.css"/>-->
+    <!--<link rel="stylesheet" href="/Public/css/themes/theme-pink.css"/>-->
+    <!--<link rel="stylesheet" href="/Public/css/themes/theme-red.css"/>-->
+    <!--<link rel="stylesheet" href="/Public/css/themes/theme-yellow.css"/>-->
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements. All other JS at the end of file. -->
+    <!--[if lt IE 9]>
+      <script src="/Public/js/html5shiv.js"></script>
+      <script src="/Public/js/respond.min.js"></script>
+    <![endif]-->
+    @await RenderSectionAsync("Css", required: false)
+
+    <!-- Document Title
+    ============================================= -->
+    <title>Bus Tracking</title>
+</head>
+
+
+
+<body class="body-scroll">
+    <!-- Document Wrapper
+    ============================================= -->
+    <div id="wrapper" class="wrapper clearfix">
+        <!-- Switcher Box -->
+        <section class="switcher-box">
+            <div class="color-options">
+                <h4>Style Switcher</h4>
+                <ul class="list-unstyled list-inline">
+                    <li data-value="/Public/css/themes/theme-blue.css"></li>
+                    <li data-value="/Public/css/themes/theme-deep-orange.css"></li>
+                    <li data-value="/Public/css/themes/theme-deep-purple.css"></li>
+                    <li data-value="/Public/css/themes/theme-default.css"></li>
+                    <li data-value="/Public/css/themes/theme-gray.css"></li>
+                    <li data-value="/Public/css/themes/theme-green.css"></li>
+                    <li data-value="/Public/css/themes/theme-light-blue.css"></li>
+                    <li data-value="/Public/css/themes/theme-light-green.css"></li>
+                    <li data-value="/Public/css/themes/theme-orange.css"></li>
+                    <li data-value="/Public/css/themes/theme-pink.css"></li>
+                    <li data-value="/Public/css/themes/theme-purple.css"></li>
+                    <li data-value="/Public/css/themes/theme-red.css"></li>
+                    <li data-value="/Public/css/themes/theme-yellow.html"></li>
+                </ul>
+            </div>
+            <div class="gear-check">
+                <i class="fa fa-cog"></i>
+            </div>
+        </section>
+        <!-- End Switcher Box -->
+        <!-- Header
+        ============================================= -->
+
+        <header id="navbar-spy" class="header header-1 header-transparent header-bordered header-fixed">
+            <nav id="primary-menu" class="navbar navbar-fixed-top">
+                <div class="container">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                                data-target="#navbar-collapse-1" aria-expanded="false">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="logo" href="/">
+                            <img class="logo-dark" width="167" height="36" src="~/AdminSection/img/logo.png" alt="bus Logo">
+                        </a>
+                    </div>
+                    <div class="collapse navbar-collapse pull-right" id="navbar-collapse-1">
+                        <ul class="nav navbar-nav nav-pos-right navbar-left nav-split">
+                            <li class="active">
+                                <a data-scroll="scrollTo" href="~/#slider">home</a>
+                            </li>
+                            <li>
+                                <a data-scroll="scrollTo" href="~/#feature2">feature</a>
+                            </li>
+                            <li>
+                                <a data-scroll="scrollTo" href="~/#video">video</a>
+                            </li>
+                            <li>
+                                <a data-scroll="scrollTo" href="~/#screenshots">screenshots</a>
+                            </li>
+            @*                <li>
+                                <a data-scroll="scrollTo" href="~/#reviews">reviews</a>
+                            </li>*@
+                            <li>
+                                <a data-scroll="scrollTo" href="~/#pricing">pricing</a>
+                            </li>
+                            <li>
+                                <a data-scroll="scrollTo" href="~/#cta">download</a>
+                            </li>  
+                            <li>
+                                <a data-scroll="scrollTo" href="~/Admin">Admin</a>
+                            </li>
+                            <li>
+                                @if (SignInManager.IsSignedIn(User))
+                                {
+                                    <a data-scroll="scrollTo" href="~/Admin/User/Logout">Logout</a>
+                                }
+                                else
+                                {
+                                    <a data-scroll="scrollTo" href="~/Admin/User/Login">Login</a>
+                                }
+                            </li>
+                        </ul>
+                    </div>
+                    <!--/.nav-collapse -->
+                </div>
+            </nav>
+
+        </header>
+
+
+        @RenderBody()
+
+
+
+        <!-- Footer #5
+        ============================================= -->
+        <footer id="footer" class="footer footer-5">
+            <!-- Copyrights
+            ============================================= -->
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-12 text--center">
+                        <div class="footer--copyright">
+                            <small>Copyright © Bus Tracking 2023</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- .container end -->
+        </footer>
+    </div>
+    <!-- #wrapper end -->
+    <!-- Footer Scripts
+    ============================================= -->
+    <script src="/Public/js/jquery-2.2.4.min.js"></script>
+    <script src="/Public/js/plugins.js"></script>
+    <script src="/Public/js/functions.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

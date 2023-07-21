@@ -1,0 +1,334 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="Ansonika">
+    <title>BUS TRACKING - @ViewData["Title"]</title>
+    <!-- Favicons-->
+    <link rel="shortcut icon" href="~/AdminSection/img/favicon.ico" type="image/x-icon">
+    <!-- Bootstrap core CSS-->
+    <link href="~/AdminSection/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Main styles -->
+    <link href="~/AdminSection/css/admin.css" rel="stylesheet">
+    <!-- Icon fonts-->
+    <link href="~/AdminSection/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <!-- Plugin styles -->
+    <link href="~/AdminSection/vendor/datatables/dataTables.bootstrap4.css" rel="stylesheet">
+    <!-- Custom styles for All pages -->
+    <link href="~/AdminSection/css/custom.css" rel="stylesheet">
+    <!-- Custom styles for this page -->
+    @await RenderSectionAsync("Css", required: false)
+
+
+</head>
+
+<body class="fixed-nav sticky-footer" id="page-top">
+    <!-- Navigation-->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-default fixed-top" id="mainNav">
+        <a class="navbar-brand" href="~/Admin">
+            <img src="~/AdminSection/img/logo.png" alt="" width="167" height="36">
+        </a>
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
+                @if (@ViewBag.UserType == UserType.Administrator.ToString() || @ViewBag.UserType == UserType.CompanyAdmin.ToString())
+                {
+                    @if (@ViewBag.UserType == UserType.Administrator.ToString())
+                    {
+                        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Dashboard">
+                            <a class="nav-link" href="~/Admin">
+                                <i class="fa fa-fw fa-dashboard"></i>
+                                <span class="nav-link-text">Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Companies Page">
+                            <a class="nav-link" href="~/Admin/Company/">
+                                <i class="fa fa-fw fa-university"></i>
+                                <span class="nav-link-text">Companies</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="My profile">
+                            <a class="nav-link" href="~/Admin/User/">
+                                <i class="fa fa-fw fa-users"></i>
+                                <span class="nav-link-text">Users</span>
+                            </a>
+                        </li>
+                    }
+                    @if (@ViewBag.UserType == UserType.CompanyAdmin.ToString())
+                    {
+                        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Buses Page">
+                            <a class="nav-link" href="~/Admin/Company/Details/@ViewBag.CompanyId">
+                                <i class="fa fa-fw fa-university"></i>
+                                <span class="nav-link-text"> My Company</span>
+                            </a>
+                        </li>
+                    }
+                    <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Notifications">
+                        <a class="nav-link" href="~/Admin/Notification/Index">
+                            <i class="fa fa-fw fa-envelope-open"></i>
+                            <span class="nav-link-text">Notifications</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Buses Page">
+                        <a class="nav-link" href="~/Admin/Bus/">
+                            <i class="fa fa-fw fa-bus"></i>
+                            <span class="nav-link-text"> Buses</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Lines Page">
+                        <a class="nav-link" href="~/Admin/Line/">
+                            <i class="fa fa-fw fa-level-up"></i>
+                            <span class="nav-link-text">Lines</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Stop Points Page">
+                        <a class="nav-link" href="~/Admin/StopPoint/">
+                            <i class="fa fa-fw fa-map-marker"></i>
+                            <span class="nav-link-text">Stop Points</span>
+                        </a>
+                    </li>
+
+
+
+                }
+                else
+                {
+                    <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Stop Points Page">
+                        <a class="nav-link" href="~/Admin/StopPoint/">
+                            <i class="fa fa-fw fa-map-marker"></i>
+                            <span class="nav-link-text">Stop Points</span>
+                        </a>
+                    </li>
+
+                }
+            </ul>
+
+            <ul class="navbar-nav sidenav-toggler">
+                <li class="nav-item">
+                    <a class="nav-link text-center" id="sidenavToggler">
+                        <i class="fa fa-fw fa-angle-left"></i>
+                    </a>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle mr-lg-2" id="messagesDropdown" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        @*       <i class="fa fa-fw fa-envelope"></i>
+                        <span class="d-lg-none">
+                        Messages
+                        <span class="badge badge-pill badge-primary">12 New</span>
+                        </span> *@
+                        @if (@ViewBag.ImageUrl != null)
+                        {
+                            <img src="@ViewBag.ImageUrl" alt="Profile Image"
+                                 style="    width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        object-fit: cover;" />
+                        }
+                        else
+                        {
+                            <img src="~/UserImg/defultImg.png" alt="Profile Image"
+                                 style="    width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        object-fit: cover;" />
+                        }
+
+
+
+                        @ViewBag.FullName
+                        @ViewBag.UserPolicy
+                        <span class="d-lg-none">
+                            <span class="badge badge-pill badge-primary"></span>
+                        </span>
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="messagesDropdown" style="left: -93px;">
+                        <h6 class="dropdown-header">@ViewBag.UserType</h6>
+
+                        @if (@ViewBag.UserType == UserType.CompanyAdmin.ToString())
+                        {
+                            <div class="dropdown-divider"></div>
+
+                            <a class="dropdown-item" href="~/Admin/Company/Details/@ViewBag.CompanyId">
+                                <strong>My Company</strong>
+                                <div class="dropdown-message small">
+                                    @ViewBag.CompanyName
+                                </div>
+                            </a>
+                        }
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="~/Admin/User/Details/@ViewBag.UserId">
+                            <strong>My Profile</strong>
+                        </a>
+                        @*  <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#">
+                        <strong>John Doe</strong>
+                        <span class="small float-right text-muted">11:21 AM</span>
+                        <div class="dropdown-message small">I've sent the final files over to you for review. When you're able to sign off of them let me know and we can discuss distribution.</div>
+                        </a>*@
+                        <div class="dropdown-divider"></div>
+                        @*<a class="dropdown-item small" href="#">View all messages</a>*@
+                        <a class="nav-link" data-toggle="modal" data-target="#exampleModal" style="color: #a00000;">
+                            <i class="fa fa-fw fa-sign-out"></i>Logout
+                        </a>
+                    </div>
+                </li>
+                @if (@ViewBag.UserType == UserType.Administrator.ToString())
+                {
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle mr-lg-2" id="alertsDropdown" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-fw fa-bell"></i>
+                            <span class="d-lg-none">
+                                Alerts
+                                <span class="badge badge-pill badge-warning">6 New</span>
+                            </span>
+                            <span class="indicator text-primary d-none d-lg-block">
+                                <i class="fa fa-fw fa-circle"></i>
+                            </span>
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="alertsDropdown" style="left: -287px;">
+                            <h6 class="dropdown-header">New Notifications:</h6>
+                            <div class="dropdown-divider"></div>
+                            <div id="alertsContainer">
+                                <!-- The content will be updated here -->
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item small" href="/Admin/Notification/Index">View all Notifications</a>
+                        </div>
+                        </li>
+                }
+
+                @*                <li class="nav-item">
+                <a class="nav-link" data-toggle="modal" data-target="#exampleModal"><i class="fa fa-fw fa-sign-out"></i>Logout</a>
+                </li>*@
+            </ul>
+        </div>
+    </nav>
+    <!-- /Navigation-->
+
+
+    <div class="content-wrapper">
+
+        @RenderBody()
+
+    </div>
+
+    <footer class="sticky-footer">
+        <div class="container">
+            <div class="text-center">
+                <small>Copyright © Bus Tracking 2023</small>
+            </div>
+        </div>
+    </footer>
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fa fa-angle-up"></i>
+    </a>
+
+    <!-- Logout Modal-->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary" href="~/Admin/User/Logout">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="~/AdminSection/vendor/jquery/jquery.min.js"></script>
+    <script src="~/AdminSection/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- Core plugin JavaScript-->
+    <script src="~/AdminSection/vendor/jquery-easing/jquery.easing.min.js"></script>
+    <!-- Page level plugin JavaScript-->
+    <script src="~/AdminSection/vendor/chart.js/Chart.js"></script>
+    <script src="~/AdminSection/vendor/datatables/jquery.dataTables.js"></script>
+    <script src="~/AdminSection/vendor/datatables/dataTables.bootstrap4.js"></script>
+    <script src="~/AdminSection/vendor/jquery.magnific-popup.min.js"></script>
+    <!-- Custom scripts for all pages-->
+    <script src="~/AdminSection/js/admin.js"></script>
+
+     @if (@ViewBag.UserType != UserType.MapAdmin.ToString())
+     {
+    <script>
+        function formatDateTime(dateTimeString) {
+            const dateTime = new Date(dateTimeString);
+            const now = new Date();
+
+            if (dateTime.toDateString() === now.toDateString()) {
+                // If it's the same day, format as hour and minute
+                return dateTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            } else {
+                // If it's another day, format as a beautiful date
+                return dateTime.toLocaleDateString([], { year: 'numeric', month: 'short', day: 'numeric' });
+            }
+        }
+        
+
+        function truncateText(text, maxLength) {
+            if (text.length > maxLength) {
+                return text.substring(0, maxLength) + '...'; // Truncate the text and add ellipsis
+            } else {
+                return text; // Return the original text if it's shorter than maxLength
+            }
+        }
+        function updateAlertsContainer() {
+            $.ajax({
+                url: '/Admin/Notification/GetLast', // Replace with the actual URL of your server-side method
+                type: 'GET',
+                dataType: 'json', // Expect JSON data from the server
+                success: function (data) {
+                    var html = ''; // Prepare the HTML content to update the "alertsContainer"
+
+                    // Loop through the data and create the HTML structure for each notification
+                    for (var i = 0; i < data.length; i++) {
+                        html += '<a class="dropdown-item" href="#">';
+                        html += '<span class="text-success">';
+                        html += '<strong>' + data[i].subject + '</strong>';
+                        html += '</span>';
+                        html += '<span class="small float-right text-muted">' + formatDateTime(data[i].createdAt) + '</span>';
+                        html += '<div class="dropdown-message small">' + truncateText(data[i].text, 50) + '</div>';
+                        html += '</a>';
+                        html += '<div class="dropdown-divider"></div>';
+                    }
+
+                    // Update the "alertsContainer" with the new HTML content
+                    $('#alertsContainer').html(html);
+                },
+                error: function (xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        }
+
+        // Call the function initially to load the data
+        updateAlertsContainer();
+
+        // Call the function every 5 seconds using setInterval
+        setInterval(function () {
+            updateAlertsContainer();
+        }, 5000); // 5000 milliseconds = 5 seconds
+    </script>
+    }
+    <!-- Custom scripts for this page-->
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+
+
+</html>

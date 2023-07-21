@@ -1,0 +1,425 @@
+﻿@model LineStopPointCompositeViewModel;
+
+@{
+    ViewData["Title"] = "Edit Line Itinerary";
+    string script = "";
+}
+
+@section Css{
+
+    <style>
+        #map {
+            height: 800px;
+            width: 100%;
+        }
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCYSc1HVpre2VsOCttajANlEwB3-Vzb7N8"></script>
+    <script>
+        function setPointId(pointId) {
+            selectedPointId = pointId; // Set the selected point id
+
+            // Update the value of the hidden input field in the form
+            document.getElementById('stopPointIdInput').value = selectedPointId;
+        }
+    </script>
+
+    <script>
+        function initMap() {
+            var locations = [
+        @foreach (var point in Model.StopPoints)
+        {
+            var isAccess = false;
+            @foreach (var lineSP in Model.Line.LinesSP)
+            {
+
+                if (point.Id == lineSP.StopPointId)
+                {
+
+                    isAccess = true;
+                    break;
+                }
+            }
+
+            if (!isAccess)
+            {
+                @:['<h4>' + '@point.Name' + '</h4>' + '<ul>' + '<li>' + '<ul class="booking_list">' + '<p>' + '<a href="#0" class="btn_1" data-toggle="modal" data-target="#create_line_modal" onclick="setPointId(\'' + @point.Id + '\')"><i class="fa fa-plus-square"></i> Create To Line </a>' + '</p>' + '</ul>' + '</li>' + '</ul>', @point.Latitude, @point.Longitude],
+
+            }
+        }
+                                                                                                        ];
+
+            var accessLocations = [
+        @foreach (var point in Model.StopPoints)
+        {
+            var isAccess = false;
+            @foreach (var lineSP in Model.Line.LinesSP)
+            {
+                if (point.Id == lineSP.StopPointId && lineSP.IsAccess)
+                {
+                    isAccess = true;
+                    break;
+                }
+            }
+
+            if (isAccess)
+            {
+                @:['<h4>' + '@point.Name' + '</h4>' + '<ul>' + '<li>' + '<ul class="booking_list">' + '<p>' + '<a href="#0" class="btn_1" data-toggle="modal" data-target="#create_line_modal" onclick="setPointId(\'' + @point.Id + '\')"><i class="fa fa-plus-square"></i> Create To Line </a>' + '</p>' + '</ul>' + '</li>' + '</ul>', @point.Latitude, @point.Longitude],
+
+
+            }
+        }
+                                                                                                        ];
+
+            var nonAccessLocations = [
+        @foreach (var point in Model.StopPoints)
+        {
+            var isShow = false;
+            @foreach (var lineSP in Model.Line.LinesSP)
+            {
+                if (point.Id == lineSP.StopPointId && !lineSP.IsAccess)
+                {
+                    isShow = true;
+                    break;
+                }
+            }
+
+            if (isShow)
+            {
+                @:["<h4>" + '@point.Name' + '</h4>' + '<ul>' + '<li>' + '<ul class="booking_list">' + '<p>' + '<a href="#0" class="btn_1" data-toggle="modal" data-target="#create_line_modal" onclick="setPointId(\'' + @point.Id + '\')"><i class="fa fa-plus-square"></i> Create To Line </a>' + '</p>' + '</ul>' + '</li>' + '</ul>', @point.Latitude, @point.Longitude],
+
+
+            }
+        }
+                                                                                                                ];
+
+
+            var map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: 31.279393272965454, lng: 34.25513974267617 },
+                zoom: 15,
+                styles: [
+                    {
+                        featureType: 'poi',
+                        elementType: 'labels',
+                        stylers: [{ visibility: 'off' }]
+                    }
+                ]
+            });
+
+            var infowindow = new google.maps.InfoWindow();
+            var stopAccessIcon = {
+                url: '/AdminSection/img/BusStopPointAccess.png',
+                size: new google.maps.Size(35, 35),
+                scaledSize: new google.maps.Size(35, 35)
+            };
+            var allStopIcon = {
+                url: '/AdminSection/img/BusStopPoint1.png',
+                size: new google.maps.Size(35, 35),
+                scaledSize: new google.maps.Size(35, 35)
+            };
+            var stopNonAccessIcon = {
+                url: '/AdminSection/img/BusStopPointNonAccess.png',
+                size: new google.maps.Size(35, 35),
+                scaledSize: new google.maps.Size(35, 35)
+            };
+
+            // Create markers for non-access stop points
+            var locationsMarkers = [];
+            for (var i = 0; i < locations.length; i++) {
+                var marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(locations[i][1], locations[i][2]),
+                    map: map,
+                    title: locations[i][0],
+                    icon: allStopIcon
+                });
+
+                google.maps.event.addListener(marker, 'click', (function (marker, i) {
+                    return function () {
+                        infowindow.setContent(locations[i][0]);
+                        infowindow.open(map, marker);
+                    }
+                })(marker, i));
+
+                locationsMarkers.push(marker);
+            }
+
+            // Create markers for access stop points
+            var accessMarkers = [];
+            for (var i = 0; i < accessLocations.length; i++) {
+                var marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(accessLocations[i][1], accessLocations[i][2]),
+                    map: map,
+                    title: accessLocations[i][0],
+                    icon: stopAccessIcon
+                });
+
+                google.maps.event.addListener(marker, 'click', (function (marker, i) {
+                    return function () {
+                        infowindow.setContent(accessLocations[i][0]);
+                        infowindow.open(map, marker);
+                    }
+                })(marker, i));
+
+                accessMarkers.push(marker);
+            }
+
+            // Create markers for access stop points
+            var nonAccessMarkers = [];
+            for (var i = 0; i < nonAccessLocations.length; i++) {
+                var marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(nonAccessLocations[i][1], nonAccessLocations[i][2]),
+                    map: map,
+                    title: nonAccessLocations[i][0],
+                    icon: stopNonAccessIcon
+                });
+
+                google.maps.event.addListener(marker, 'click', (function (marker, i) {
+                    return function () {
+                        infowindow.setContent(nonAccessLocations[i][0]);
+                        infowindow.open(map, marker);
+                    }
+                })(marker, i));
+
+                nonAccessMarkers.push(marker);
+            }
+
+
+        @if (Model.Line.Bus != null)
+        {
+            @:    var busMarker = new google.maps.Marker({
+            @:position: new google.maps.LatLng(@Model.Line.Bus.Latitude, @Model.Line.Bus.Longitude),
+            @:map: map,
+            @:icon:
+            @:{
+            @:url: '/AdminSection/img/bus-icon.png',
+            @:size: new google.maps.Size(32, 32),
+            @:scaledSize: new google.maps.Size(32, 32)
+            @:  }
+            @:  });
+
+            @:    function getLiveBusLocation()
+            @:{
+            @:$.ajax({
+            @:url: '/Admin/Bus/GetBusLocation/@Model.Line.Bus.Id',
+            @:type: 'GET',
+            @:success: function (data) {
+            @:              if (busMarker)
+            @:{
+            @:busMarker.setPosition(new google.maps.LatLng(data.latitude, data.longitude));
+            @:console.log(data.latitude);
+            @:console.log(data.longitude);
+            @:          }
+            @:      },
+            @:error: function () {
+            @:console.log('Error fetching bus location');
+            @:       }
+            @:   });
+            @:    }
+
+            @:busMarker.addListener('click', function () {
+            @:window.open('/Admin/Bus/Details/@Model.Line.Bus.Id', '_blank');
+            @: });
+            @:setInterval(getLiveBusLocation, 5000);
+
+            @:busMarker.addListener('click', function () {
+            @:window.open('/Admin/Bus/Details/@Model.Line.Bus.Id', '_blank');
+            @:  });
+            @:setInterval(getLiveBusLocation, 5000);
+
+        }
+
+  
+                                                    // Use nonAccessMarkers and accessMarkers as needed
+              }
+    </script>
+
+
+}
+@section Scripts{
+    <script src="~/AdminSection/vendor/bootstrap-datepicker.js"></script>
+    <script>$('input.date-pick').datepicker();</script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCYSc1HVpre2VsOCttajANlEwB3-Vzb7N8&callback=initMap"></script>
+    }
+<div class="container-fluid">
+    <!-- Breadcrumbs-->
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="~/Admin">Dashboard</a>
+        </li>
+        <li class="breadcrumb-item active">Line</li>
+    </ol>
+    <div class="box_general pb-3">
+        <div class="header_box">
+            <h2 class="d-inline-block">Edit Line Itinerary</h2>
+        </div>
+        <div class="list_general order">
+            <ul>
+                <li>
+                    <figure><img src="img/item_1.jpg" alt=""></figure>
+                    <h4>
+                        @Model.Line.Name
+                        @if (Model.Line.Bus != null)
+                        {
+                            <i class="approved">Active</i>
+                        }
+                        else
+                        {
+
+                            <i class="cancel">Inactive</i>
+
+                        }
+
+                    </h4>
+                    <ul class="booking_list">
+                        <li><strong>Code : </strong>@Model.Line.Code</li>
+                        <li>
+                            <strong>Company : </strong>
+                            <a href="~/Admin/Company/Details/@Model.Line.Company.Id">  @Model.Line.Company.Name</a>
+                        </li>
+                        <li><strong>Bus : </strong>@(Model.Line.Bus != null ? @Model.Line.Bus.Name : "Null") </li>
+                    </ul>
+
+                </li>
+            </ul>
+        </div>
+        <hr>
+        <h5>The stopping points that this line passes through :</h5>
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Order</th>
+                        <th>Name</th>
+                        <th>City</th>
+                        <th>Address</th>
+                        <th>TimeAccess</th>
+                        <th>IsAccess</th>
+                        <th>Operation</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>Order</th>
+                        <th>Name</th>
+                        <th>City</th>
+                        <th>Address</th>
+                        <th>TimeAccess</th>
+                        <th>IsAccess</th>
+                        <th>Operation</th>
+
+                    </tr>
+                </tfoot>
+                <tbody>
+                    @if (Model.Line.LinesSP.Any())
+                    {
+                        foreach (var point in Model.Line.LinesSP)
+                        {
+                            <tr>
+                                <td>@point.Order </td>
+                                <td> <a href="~/Admin/StopPoint/Details/@point.StopPoint.Id">@point.StopPoint.Name</a></td>
+                                <td>@point.StopPoint.City.Name</td>
+                                <td>@point.StopPoint.Address</td>
+                                <td>@point.TimeAccess</td>
+                                <td>
+                                    @if (@point.IsAccess)
+                                    {
+                                        <i class="approved">True</i>
+                                    }
+                                    else
+                                    {
+                                        <i class="cancel">False</i>
+                                    }
+                                </td>
+                                <td>
+                                    <a href="~/Admin/LineStopPoint/Delete/@point.Id" onclick="return confirm('Are you sure you want to delete @point.Order?');"><strong>Delete</strong></a>
+                                </td>
+
+                            </tr>
+                        }
+
+                    }
+
+
+                </tbody>
+            </table>
+        </div>
+
+
+
+        <div class="table-responsive">
+            <!--Map-->
+            <div id="map"></div>
+        </div>
+
+    </div>
+</div>
+
+
+
+
+
+<!-- Line Detail Modal -->
+<form action="~/Admin/Line/Edit" method="post" enctype="multipart/form-data">
+    <div class="modal fade" id="client_detail_modal" tabindex="-1" role="dialog" aria-labelledby="client_detail_modalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="client_detail_modalLabel">Edit Line Stop detail</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input hidden required asp-for="UpdateDto.Id" value="@ViewBag.lineId">
+                    <div class="form-group">
+                        <label>Time Access</label>
+                        <input required asp-for="UpdateDto.TimeAccess" type="text" class="form-control" value="">
+                    </div>
+                    <!-- /Row -->
+                    <div class="form-group">
+                        <label>Order</label>
+                        <input required asp-for="UpdateDto.Order" type="number" class="form-control" value="">
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn_1 medium">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+
+<form action="~/Admin/LineStopPoint/Create" method="post" enctype="multipart/form-data">
+    <div class="modal fade" id="create_line_modal" tabindex="-1" role="dialog" aria-labelledby="create_line_modalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="create_line_modalLabel">Create Stop point in line Line</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input hidden required asp-for="CreateDto.LineId" value="@ViewBag.lineId">
+                    <input hidden required asp-for="CreateDto.StopPointId" id="stopPointIdInput" value="">
+                    <div class="form-group">
+                        <label>Time Access</label>
+                        <input required asp-for="CreateDto.TimeAccess" type="time" class="form-control" value="">
+                    </div>
+                    <!-- /Row -->
+                    <div class="form-group">
+                        <label>Order</label>
+                        <input required asp-for="CreateDto.Order" type="number" class="form-control" value="1">
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn_1 medium">Create</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

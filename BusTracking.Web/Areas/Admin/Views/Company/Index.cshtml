@@ -1,0 +1,110 @@
+﻿@model List<CompanyViewModel>;
+@using BusTracking.Core.Enums;
+
+@{
+    ViewData["Title"] = "Companies Page";
+}
+
+@section Css{
+
+}
+@section Scripts{
+    <script src="~/AdminSection/js/admin-datatables.js"></script>
+}
+
+<div class="container-fluid">
+    <!-- Breadcrumbs-->
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="#">Dashboard</a>
+        </li>
+        <li class="breadcrumb-item active">Companies</li>
+    </ol>
+    <!-- Example DataTables Card-->
+    <div class="card mb-3">
+        <div class="card-header">
+            <i class="fa fa-table"></i> Companies Table
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Logo</th>
+                            <th>Company</th>
+                            <th>Address</th>
+                            <th>Phone Number</th>
+                            <th>Facebook</th>
+                            <th>Status</th>
+                            <th>Oprations</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>ID</th>
+                            <th>Logo</th>
+                            <th>Company</th>
+                            <th>Address</th>
+                            <th>Phone Number</th>
+                            <th>Facebook</th>
+                            <th>Status</th>
+                            <th>Oprations</th>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        @foreach (var company in Model)
+                        {
+                            <tr>
+                                <td>@company.Id</td>
+                                <td> <a href="~/Admin/Company/Details/@company.Id"><img src="~/@company.Logo" alt="" style="width:100px;"></a></td>
+                                <td><a href="~/Admin/Company/Details/@company.Id">@company.Name</a></td>
+                                <td>@company.Address</td>
+                                <td>@company.PhoneNumber</td>
+                                <td>
+                                    @if (company.Facebook != null)
+                                    {
+                                        <a href="@company.Facebook" target="_blank">Visit Facebook</a>
+                                    }
+                                    else
+                                    {
+                                        @:Null
+                                    }
+
+                                </td>
+                                <td>
+                                    @if (company.Status == Status.Activated)
+                                    {
+                                        <i class="approved">Active</i>
+                                    }
+                                    else
+                                    {
+                                        <i class="pending">Pending</i>
+                                    }
+
+
+
+                                </td>
+                                <td>
+                                    <a href="~/Admin/Company/Delete/@company.Id" onclick="return confirm('Are you sure you want to delete @company.Name?');"><strong>Delete</strong></a>
+                                    |
+                                    @if (company.Status == Status.Activated)
+                                    {
+                                        <a href="~/Admin/Company/SetPending/@company.Id" onclick="return confirm('Are you sure you want to Pending @company.Name?');"><strong> Pending </strong></a>
+                                    }
+                                    else
+                                    {
+                                        <a href="~/Admin/Company/SetActive/@company.Id" onclick="return confirm('Are you sure you want to Active @company.Name?');"><strong> Active </strong></a>
+                                    }
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- /tables-->
+</div>

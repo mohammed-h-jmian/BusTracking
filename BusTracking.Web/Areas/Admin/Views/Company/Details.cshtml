@@ -1,0 +1,404 @@
+﻿@model CompanyCompositeViewModel;
+@using BusTracking.Core.Enums;
+
+@{
+    ViewData["Title"] = Model.Company.Name + " Details";
+    int lineNum = 0;
+    int busNum = 0;
+}
+
+@section Css{
+    <style>
+        /* Styles for the modal */
+        .modal1 {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal1-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 60%;
+        }
+
+        /* Styles to show the modal */
+        .show-modal1 {
+            display: block;
+        }
+    </style>
+
+}
+@section Scripts{
+    <script src="~/AdminSection/vendor/bootstrap-datepicker.js"></script>
+    <script>$('input.date-pick').datepicker();</script>
+    <script>
+        var modal = document.getElementById("myModal");
+
+        // Function to open the modal
+        function openModal() {
+            modal.classList.add("show-modal1");
+        }
+
+        // Function to close the modal
+        function closeModal() {
+            modal.classList.remove("show-modal1");
+            window.location.reload(); // Refresh the page
+        }
+    </script>
+}
+
+<div class="container-fluid">
+    <!-- Breadcrumbs-->
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="~/Admin">Dashboard</a>
+        </li>
+        <li class="breadcrumb-item active">Company</li>
+    </ol>
+    <div class="box_general pb-3">
+        <div class="header_box">
+            <h2 class="d-inline-block">Details </h2>
+        </div>
+        <div class="list_general order">
+            <ul>
+                <li>
+                    <figure><img src="@Model.Company.Logo" alt=""></figure>
+                    <h4>
+                        @Model.Company.Name
+                        @if (@ViewBag.UserType == UserType.Administrator.ToString())
+                        {
+                            @if (@Model.Company.Status == Status.Activated)
+                            {
+                                <i class="approved">Active</i>
+                            }
+                            else
+                            {
+                                <i class="pending">Pending</i>
+                            }
+                        }
+
+                    </h4>
+                    <ul class="booking_list">
+                        <li><strong>Address</strong>@Model.Company.Address</li>
+                        <li><strong>Phone Number</strong> <a href="#0">@Model.Company.PhoneNumber</a> </li>
+                        <li><strong>Facebook</strong> <a href="@Model.Company.Facebook" target="_blank">Visit Facebook</a></li>
+
+                    </ul>
+                    @if (@ViewBag.UserType == UserType.CompanyAdmin.ToString())
+                    {
+                        <p><a href="#0" class="btn_1" data-toggle="modal" data-target="#client_detail_modal"><i class="fa fa-fw fa-pencil"></i> Edit company detail</a></p>
+                    }
+
+                    <ul class="buttons">
+                        @if (@ViewBag.UserType == UserType.Administrator.ToString())
+                        {
+                            @if (@Model.Company.Status == Status.Activated)
+                            {
+                                <li>
+                                    <a href="~/Admin/Company/SetPending/@Model.Company.Id" onclick="return confirm('Are you sure you want to Pending @Model.Company.Name?');" class="btn_1 gray delete">
+                                        <i class="fa fa-fw fa-check-circle-o"></i> Pending
+                                    </a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li>
+                                    <a href="~/Admin/Company/SetActive/@Model.Company.Id" onclick="return confirm('Are you sure you want to Active @Model.Company.Name?');" class="btn_1 gray approve">
+                                        <i class="fa fa-fw fa-check-circle-o"></i> Activate
+                                    </a>
+                                </li>
+                            }
+                        }
+
+                    </ul>
+
+
+
+                </li>
+            </ul>
+        </div>
+        <hr>
+        <!-- Start Lines detail -->
+        <div style="display:flex;justify-content: space-between;margin-bottom:10px">
+            <h5>Lines</h5>
+            @if (@ViewBag.UserType == UserType.CompanyAdmin.ToString())
+            {
+                <a href="#0" class="btn_1" data-toggle="modal" data-target="#create_line_modal">
+                    <i class="fa fa-plus-square"></i> Add New Line
+                </a>
+            }
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Bus</th>
+                                <th>Status</th>
+                                <th>Expired</th>
+                                @if (@ViewBag.UserType == UserType.CompanyAdmin.ToString())
+                                {
+                                    <th>Oprations</th>
+                                }
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Bus</th>
+                                <th>Status</th>
+                                <th>Expired</th>
+                                @if (@ViewBag.UserType == UserType.CompanyAdmin.ToString())
+                                {
+                                    <th>Oprations</th>
+                                }
+                            </tr>
+                        </tfoot>
+                        <tbody>
+                            @if (Model.Company.Lines.Any())
+                            {
+                                foreach (var line in Model.Company.Lines)
+                                {
+                                    lineNum++;
+                                    <tr>
+                                        <td>@line.Id</td>
+                                        <td><a href="~/Admin/Line/Details/@line.Id">@line.Name</a></td>
+                                        <td>@(line.Bus != null ? line.Bus.Name : "Null")</td>
+                                        <td>
+                                            <i class="@(line.Bus != null ? "approved" : "cancel")">
+                                                @(line.Bus != null ? "Active" : "Inactive")
+                                            </i>
+                                        </td>
+                                        <td>
+                                            <i class="@(@line.ActiveExpired > DateTime.Now ? "approved" : "cancel")">
+                                                @line.ActiveExpired
+                                            </i>
+                                        </td>
+                                        @if (@ViewBag.UserType == UserType.CompanyAdmin.ToString())
+                                        {
+                                            <td>
+                                                @*  <a href="edit-order.html"><strong>Edit</strong></a> |  <a href="#0"><strong>Delete</strong></a>*@
+                                                <a href="~/Admin/Line/Delete/@line.Id" onclick="return confirm('Are you sure you want to delete ?');"><strong>Delete</strong></a>
+
+                                            </td>
+                                        }
+                                    </tr>
+                                }
+                            }
+
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="row justify-content-end total_order">
+            <div class="col-xl-3 col-lg-4 col-md-5">
+                <ul>
+                    <li>
+                        <span>Total Line</span> @lineNum
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- End Lines detail -->
+        <!-- Start Buses detail -->
+        <div style="display:flex;justify-content: space-between;margin-bottom:10px">
+            <h5>Buses</h5>
+            @*            <a href="#0" class="btn_1" data-toggle="modal" data-target="#create_bus_modal">
+            <i class="fa fa-plus-square"></i> Add New Bus
+            </a>*@
+            @if (@ViewBag.UserType == UserType.CompanyAdmin.ToString())
+            {
+                <button class="btn_1" type="button" onclick="openModal()"><i class="fa fa-plus-square"></i> Add New Bus</button>
+            }
+
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>IMG</th>
+                            <th>Number</th>
+                            <th>Name</th>
+                            <th>IsActive</th>
+                            @if (@ViewBag.UserType == UserType.CompanyAdmin.ToString())
+                            {
+                                <th>Operations</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>ID</th>
+                            <th>IMG</th>
+                            <th>Number</th>
+                            <th>Name</th>
+                            <th>IsActive</th>
+                            @if (@ViewBag.UserType == UserType.CompanyAdmin.ToString())
+                            {
+                                <th>Operations</th>
+                            }
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        @if (Model.Company.Buses.Any())
+                        {
+                            foreach (var bus in Model.Company.Buses)
+                            {
+                                busNum++;
+                                <tr>
+                                    <td>@bus.Id</td>
+                                    <td> <a href="~/Admin/Bus/Details/@bus.Id"><img src="~/@bus.ImgPath" alt="" style="width:100px;"></a></td>
+                                    <td><a href="~/Admin/Bus/Details/@bus.Id"><strong>@bus.Number</strong></a></td>
+                                    <td><a href="~/Admin/Bus/Details/@bus.Id"><strong>@bus.Name</strong></a></td>
+                                    <td>
+                                        @if (bus.IsActive)
+                                        {
+                                            <i class="approved">Active</i>
+                                        }
+                                        else
+                                        {
+                                            <i class="cancel">Deactive</i>
+                                        }
+
+                                    </td>
+                                    @if (@ViewBag.UserType == UserType.CompanyAdmin.ToString())
+                                    {
+                                        <td>
+                                            @*<a href="edit-order.html"><strong>Edit</strong></a> | <a href="#0"><strong>Delete</strong></a>*@
+
+                                            <a href="~/Admin/Bus/Delete/@bus.Id" onclick="return confirm('Are you sure you want to delete @bus.Name?');"><strong>Delete</strong></a>
+                                        </td>
+                                    }
+                                </tr>
+                            }
+                        }
+
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="row justify-content-end total_order">
+            <div class="col-xl-3 col-lg-4 col-md-5">
+                <ul>
+                    <li>
+                        <span>Total Bus</span> @busNum
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <!-- End Buses detail-->
+
+    </div>
+    <!-- /box_general-->
+</div>
+
+<!-- Company Detail Modal -->
+<form action="~/Admin/Company/Edit" method="post" enctype="multipart/form-data">
+    <div class="modal fade" id="client_detail_modal" tabindex="-1" role="dialog" aria-labelledby="client_detail_modalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="client_detail_modalLabel">Edit company detail</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input hidden required asp-for="UpdateDto.Id" value="@Model.Company.Id" />
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input required asp-for="UpdateDto.Name" type="text" class="form-control" value="@Model.Company.Name">
+                    </div>
+                    <!-- /Row -->
+                    <div class="form-group">
+                        <label>Address</label>
+                        <input required asp-for="UpdateDto.Address" type="text" class="form-control" value="@Model.Company.Address">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Phone Number</label>
+                                <input required asp-for="UpdateDto.PhoneNumber" type="text" class="form-control" value="@Model.Company.PhoneNumber">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Facebook</label>
+                                <input asp-for="UpdateDto.Facebook" type="text" class="form-control" value="@Model.Company.Facebook">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Logo</label>
+                        <input asp-for="UpdateDto.Logo" type="file" accept="image/*" class="form-control-file">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    @*<a class="btn btn-primary" href="#0">Save</a>*@
+                    <button type="submit" class="btn_1 medium">Save</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</form>
+<!-- Create New Line Modal -->
+<form action="~/Admin/Line/Create" method="post" enctype="multipart/form-data">
+    <div class="modal fade" id="create_line_modal" tabindex="-1" role="dialog" aria-labelledby="create_line_modalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="client_detail_modalLabel">Create Line</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <input hidden asp-for="CreateLineDto.CompanyId" value="@Model.Company.Id">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input required asp-for="CreateLineDto.Name" type="text" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    @*<a class="btn btn-primary" href="#0">Save</a>*@
+                    <button type="submit" class="btn_1 medium">Save</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</form>
+
+
+<!-- Modal content -->
+<div id="myModal" class="modal1">
+    <div class="modal1-content">
+        <!-- Include the page content you want to display here -->
+        <iframe src="~/Admin/Bus/Create?CompanyId=@Model.Company.Id" width="100%" height="600"></iframe>
+        <button class="btn_1 medium gray" type="button" onclick="closeModal()">Close</button>
+    </div>
+</div>
